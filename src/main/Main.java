@@ -2,22 +2,15 @@ package main;
 
 import TDAs.api.MapaTDA;
 import TDAs.impl.Mapa;
-import apis.ColaPrioridadTDA;
 import apis.ConjuntoTDA;
-import impl.ColaPrioridadAO;
 import impl.ConjuntoLD;
-import modelo.Camino;
 import modelo.Cliente;
-import modelo.Par;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class Main {
 
@@ -65,7 +58,7 @@ public class Main {
                         mapaPrim.EliminarVertice(hijoId);
 
                         km = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
-                        mapaPrim = prim(mapaPrim);  // ver 
+                        mapaPrim = prim(mapaPrim);  
                    
                         totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrim);
                         cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapaPrim),
@@ -86,6 +79,9 @@ public class Main {
 
         if(visitados.size() == clientes.size()){
             mostrarRecorrido(visitados); // CAMBIAR A LISTA CAMINOS
+        }
+        else if(noVisitar.size() == clientes.size() - 1) {
+        	System.out.println("No existen caminos posibles");
         }
         else{
         	if (clienteIdAux==null) {
@@ -245,7 +241,7 @@ public class Main {
     private static void crearCamino(String line){
         String[] lineArray = line.split("\t");
         mapa.AgregarArista(getIdClienteByChar(lineArray[0]), getIdClienteByChar(lineArray[1]),
-                Integer.parseInt(lineArray[2]), Double.parseDouble(lineArray[3].replace(",", ".")));
+                Integer.parseInt(lineArray[2]), Double.parseDouble(lineArray[3].replace(",", ".")));            
     }
 
     private static Integer getIdClienteByChar(String letra){
@@ -289,7 +285,7 @@ public class Main {
         		verticesAux.sacar(aux);
         		if (mapaAux.ExisteArista(elemento, aux)) {
         			if (!resultado.ExisteArista(elemento, aux)) {
-        				resultado.AgregarArista(aux, elemento , mapaAux.PesoAristaMinutos(elemento, aux) , mapaAux.PesoAristaKm(aux, elemento) );	
+        				resultado.AgregarArista(aux, elemento , mapaAux.PesoAristaMinutos(aux, elemento) , mapaAux.PesoAristaKm(aux, elemento) );	
         			}
         			else if (resultado.PesoAristaKm(aux, elemento)  > mapaAux.PesoAristaKm(aux, elemento)) {
         					resultado.ElminarArista(elemento, aux);
@@ -301,95 +297,6 @@ public class Main {
         	}
         
         return resultado;
-    }
-    
-    /*
-    public static MapaTDA caminoMinimo(MapaTDA grafo) {
-        MapaTDA grafoR = new Mapa();
-        grafoR.InicializarMapa();
-        ConjuntoTDA conjunto = grafo.Vertices();
-        Map<Integer,Integer> conjuto3 = new HashMap<>();
-        int cantidadVertices = 0;
-        int v = 0; // Número de nodos
-        while(!conjunto.conjuntoVacio()){
-            int valor = conjunto.elegir();
-            grafoR.AgregarVertice(valor);
-            conjuto3.put(valor,valor);
-            cantidadVertices++;
-            conjunto.sacar(valor);
-        }
-        ColaPrioridadTDA cola = new ColaPrioridadAO();
-        ColaPrioridadTDA aux = new ColaPrioridadAO();
-        aux.inicializarCola();
-        cola.inicializarCola();
-        conjunto = grafo.Vertices();
-        ConjuntoTDA conjunto1 = grafo.Vertices();
-        ConjuntoTDA aux1 = new ConjuntoLD();
-        aux1.inicializarConjunto();
-        while(!conjunto.conjuntoVacio()) {
-            int o = conjunto.elegir();
-            conjunto.sacar(o);
-            conjunto1.sacar(o);
-            while(!conjunto1.conjuntoVacio()) {
-                int d = conjunto1.elegir();
-                aux1.agregar(d);
-                conjunto1.sacar(d);
-                if (grafo.ExisteArista(o, d) && !existe(cola,arista(o,d,grafo))) {
-                    cola.acolarPrioridad(arista(o,d,grafo),grafo.peso(o,d));
-                }
-            }
-            while(!aux1.conjuntoVacio()) {
-                int x = aux1.elegir();
-                conjunto1.agregar(x);
-                aux1.sacar(x);
-            }
-        }
-        while (cantidadVertices > 1 && !cola.colaVacia()){
-            Edge arista = cola.primero();
-            cola.desacolar();
-            if(conjuto3.get(arista.from) != conjuto3.get(arista.to)){
-                cantidadVertices--;
-                Set<Integer> integerSet = conjuto3.keySet();
-                for(Integer e: integerSet){
-                    if (conjuto3.get(e) == conjuto3.get(arista.to)){
-                        conjuto3.replace(e,conjuto3.get(e));
-                    }
-                }
-                grafoR.agregarArista(arista.from, arista.to, arista.data);
-            }
-        }
-        return grafoR;
-    }
-
-    private static Par arista(int o, int d, MapaTDA grafo) {
-        Par p = new Par();
-        if(grafo.ExisteArista(o,d)) {
-            p.from = o;
-            p.to = d;
-            p.data = grafo.PesoAristaKm(o, d);
-            p.minutos=grafo.PesoAristaMinutos(o, d);
-        }
-        return p;
-    }
-
-    private static boolean existe(ColaPrioridadTDA cola, Par arista) {
-        boolean exist = false;
-        ColaPrioridadTDA copia = new ColaPrioridadAO();
-        copia.inicializarCola();
-        while (!cola.colaVacia()){
-            copia.acolarPrioridad(cola.primero(), cola.prioridad());
-            if(arista.from == cola.primero().from && arista.to == cola.primero().to && arista.data == cola.primero().data ){
-                exist = true;
-            }
-            cola.desacolar();
-        }
-        while (!copia.colaVacia()){
-            cola.acolarPrioridad(copia.primero(), copia.prioridad());
-            copia.desacolar();
-        }
-        return exist;
-    }
-    */
-    
+    }     
 }
 

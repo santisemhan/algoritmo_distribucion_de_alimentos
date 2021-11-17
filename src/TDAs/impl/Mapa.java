@@ -90,14 +90,25 @@ public class Mapa implements MapaTDA {
     public void ElminarArista(int v1, int v2) {
         NodoMapa n1 = Vert2Nodo(v1);
         EliminarAristaNodo(n1, v2);
+        
+        NodoMapa n2 = Vert2Nodo(v2);
+        EliminarAristaNodo(n2, v1);
     }
 
     @Override
-    public double PesoAristaKm(int v1, int v2) {
+    public double PesoAristaKm(int v1, int v2) {   	
         NodoMapa n1 = Vert2Nodo(v1);
         NodoArista aux = n1.arista;
-        while(aux.nodoDestino.nodo != v2){
-            aux = aux.sigArista;
+        if(aux != null) {
+        	while(aux.nodoDestino.nodo != v2){
+                aux = aux.sigArista;
+            }
+        }else {
+        	n1 = Vert2Nodo(v2);
+            aux = n1.arista;
+            while(aux.nodoDestino.nodo != v1){
+                aux = aux.sigArista;
+            }        
         }
         return aux.km;
     }
@@ -106,8 +117,17 @@ public class Mapa implements MapaTDA {
     public int PesoAristaMinutos(int v1, int v2) {
         NodoMapa n1 = Vert2Nodo(v1);
         NodoArista aux = n1.arista;
+        if(aux != null) {
         while (aux.nodoDestino.nodo != v2) {
             aux = aux.sigArista;
+        }
+        }
+        else {
+        	n1 = Vert2Nodo(v2);
+            aux = n1.arista;
+            while (aux.nodoDestino.nodo != v1) {
+                aux = aux.sigArista;
+            }
         }
         return aux.minutos;
     }
@@ -118,7 +138,15 @@ public class Mapa implements MapaTDA {
         NodoArista aux = n1.arista;
         while(aux != null && aux.nodoDestino.nodo != v2){
             aux = aux.sigArista;
+        }       
+        if(aux == null) {
+        	n1 = Vert2Nodo(v2);
+            aux = n1.arista;
+            while(aux != null && aux.nodoDestino.nodo != v1){
+                aux = aux.sigArista;
+            }
         }
+        
         return aux != null;
     }
 
