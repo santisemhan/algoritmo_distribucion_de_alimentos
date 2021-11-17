@@ -1,0 +1,5 @@
+Cliente	Denominacion	Direccion	Cantidad	HorarioInicio	HorarioFinal
+A	CentroDistribucion	"Comesana 4056"			
+B	Boedo	"Boedo 777"	100	7	17
+C	Villareal	"Lope de Vega 2503"	100	7	17
+D	Flores	"Eva Peron 2202"	250	7	17
