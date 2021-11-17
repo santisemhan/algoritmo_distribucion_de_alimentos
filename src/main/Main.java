@@ -4,6 +4,7 @@ import TDAs.api.MapaTDA;
 import TDAs.impl.Mapa;
 import apis.ConjuntoTDA;
 import impl.ConjuntoLD;
+import modelo.Camino;
 import modelo.Cliente;
 
 import java.io.BufferedReader;
@@ -75,7 +76,7 @@ public class Main {
         }
 
         if(visitados.size() == clientes.size()){
-            mostrarRecorrido();
+            mostrarRecorrido(visitados); // CAMBIAR A LISTA CAMINOS
         }
         else{
         	if (clienteIdAux==null) {
@@ -91,8 +92,17 @@ public class Main {
         
     }
 
-    private static void mostrarRecorrido(){
-        System.out.println("Recorrido final...");
+    private static void mostrarRecorrido(List<Integer> visitados){
+    	System.out.println("Recorrido final...");
+    	/*
+    	for (Camino camino: caminos) {
+    		System.out.println("De : " + origenDestinoToChar(camino.getIdClienteOrigen()) + " hasta : " + origenDestinoToChar(camino.getIdClienteDestino()) + 
+    				" con kms : " + camino.getKm() + " llegando a las  : " + camino.getTiempo());
+    	}
+    	*/
+    	for (Integer v : visitados) {
+    		System.out.println(v);
+    	}
     }
 
     public static MapaTDA copiarGrafo(MapaTDA grOrigen, MapaTDA grDestino) {
