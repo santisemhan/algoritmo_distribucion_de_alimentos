@@ -138,24 +138,15 @@ public class Mapa implements MapaTDA {
     public ConjuntoTDA Adyacentes(int v) {
         ConjuntoTDA conjResultante = new ConjuntoLD();
         conjResultante.inicializarConjunto();
-        ConjuntoTDA ws;
-        ConjuntoTDA xs= this.Vertices();
-        if (xs.pertenece(v)) {
-            xs.sacar(v);
-            while(!xs.conjuntoVacio()) {//Candidatos a x
-                int x =xs.elegir();
-                if(this.ExisteArista(v,x)) {
-                    ws=this.Vertices();
-                    ws.sacar(v);
-                    while(!ws.conjuntoVacio()) {//Candidatos a w
-                        int w=ws.elegir();
-                        if (this.ExisteArista(x, w))// Por cada x debo verificar que exista un w
-                            conjResultante.agregar(w);
-                        ws.sacar(w);
-                    }
-                }
-                xs.sacar(x);
-            }
+        ConjuntoTDA vertices=this.Vertices();
+        vertices.sacar(v);
+        while (!vertices.conjuntoVacio()) {
+        	Integer v1=vertices.elegir();
+        	vertices.sacar(v1);
+        	if (this.ExisteArista(v, v1)) {
+        		conjResultante.agregar(v1);
+        	}
+        	
         }
         return conjResultante;
     }

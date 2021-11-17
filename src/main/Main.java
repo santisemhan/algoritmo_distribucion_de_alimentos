@@ -20,27 +20,26 @@ public class Main {
     public static void main(String[] args) throws Exception {
         generarClientes();
         generarMapa();
-
-        planificarRecorrido(1, new ArrayList<Integer>(), (double)0, 7 * 60, 0);
+        
+        planificarRecorrido(1, new ArrayList<Integer>(), (double)0, 7 * 60, 0, new ArrayList<Integer>());
     }
 
-    private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaInf, Integer hora, double kmVisitados) {
+    private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaInf, Integer hora, double kmVisitados,List<Integer> noVisitar) {
+    	
         MapaTDA mapaAux = new Mapa();
         mapaAux.InicializarMapa();
         mapaAux = copiarGrafo(mapa, mapaAux);
 
-        visitados.add(clienteActual);
-
         ConjuntoTDA hijos = mapa.Adyacentes(clienteActual);
-
+   
         double cota = cotaInf;
         Integer clienteIdAux = null;
         Integer horarioFin = hora;
 
         while (!hijos.conjuntoVacio()){
             Integer hijoId = hijos.elegir();
-            Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
-            if(!visitados.contains(hijoId)) {
+            if(!visitados.contains(hijoId) && !noVisitar.contains(hijoId)) {
+            	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
                 while(mapaAux.ExisteArista(clienteActual,hijoId)){
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
                     if (clienteHijo.getDisponibleDesde() * 60 <= hora + tiempo && hora + tiempo <= clienteHijo.getDisponibleHasta() * 60) {
@@ -55,27 +54,17 @@ public class Main {
 
                         Integer primerClienteId = 1;
                         Integer ultimoClienteId = hijoId;
-
-                        double pesoActual = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
-                        if(kmVisitados == 0){
-                            MapaTDA mapaPrimAux = prim(mapaPrim);
-                            km = pesoActual;
-                            totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrimAux);
-                            cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapaPrimAux),
-                                    calcularARecubrimiento(ultimoClienteId, mapaPrimAux));
-                        }
-                        else if(kmVisitados > pesoActual){
-                            MapaTDA mapaPrimAux = prim(mapaPrim);
-                            km = pesoActual;
-                            totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrimAux);
-                            cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapaPrimAux),
-                                    calcularARecubrimiento(ultimoClienteId, mapaPrimAux));
-                        }
-
+                        km = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
+                        mapaPrim = prim(mapaPrim);  // ver 
+                   
+                        totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrim);
+                        cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapaPrim),
+                                calcularARecubrimiento(ultimoClienteId, mapaPrim));
+                        
                         if(cotaAux < cota){
                             cota = cotaAux;
-                            kmVisitados = totalKmRecubrimiento;
-                            horarioFin += tiempo;
+                            kmVisitados = km ;
+                            horarioFin = hora+tiempo;
                             clienteIdAux = hijoId;
                         }
                     }
@@ -85,14 +74,21 @@ public class Main {
             hijos.sacar(hijoId);
         }
 
-        visitados.add(clienteIdAux);
-
         if(visitados.size() == clientes.size()){
             mostrarRecorrido();
         }
         else{
-            planificarRecorrido(clienteIdAux, visitados, cota, horarioFin, kmVisitados);
+        	if (clienteIdAux==null) {
+        		noVisitar.add(clienteActual);
+        		Integer ultimo=visitados.get(visitados.size()-1);
+        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados,noVisitar);
+        	}
+        	else {
+        		visitados.add(clienteActual);
+        		planificarRecorrido(clienteIdAux, visitados, cota, horarioFin, kmVisitados,new ArrayList<Integer>());
+        	}
         }
+        
     }
 
     private static void mostrarRecorrido(){
@@ -193,7 +189,7 @@ public class Main {
         String line = br.readLine();
 
         line = br.readLine(); // Salteo los headers
-        clientes.add(new Cliente(0, 0, 9999999)); // Creo el centro de distribucion
+        clientes.add(new Cliente(0, 0, 0)); // Creo el centro de distribucion
         mapa.AgregarVertice(1);
         line = br.readLine();
 
