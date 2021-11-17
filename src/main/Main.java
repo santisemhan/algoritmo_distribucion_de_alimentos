@@ -43,7 +43,7 @@ public class Main {
             	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
                 while(mapaAux.ExisteArista(clienteActual,hijoId)){
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
-                    if (clienteHijo.getDisponibleDesde() * 60 <= hora + tiempo && hora + tiempo <= clienteHijo.getDisponibleHasta() * 60) {
+                    if (clienteHijo.getMinutosDisponibleDesde() <= hora + tiempo && hora + tiempo <= clienteHijo.getMinutosDisponibleHasta()) {
                         double cotaAux = 0, km, totalKmRecubrimiento = 0;
                         MapaTDA mapaPrim = new Mapa();
                         mapaPrim.InicializarMapa();
