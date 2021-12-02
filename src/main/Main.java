@@ -29,84 +29,87 @@ public class Main {
 
     private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, double kmVisitados,List<Integer> noVisitar) {
     	
-    	if(clienteActual == 1 && noVisitar.size() == clientes.size() - 1) {
-    		mostrarRecorrido(visitados);
+    	if(clienteActual == 1 && noVisitar.size() == (clientes.size() - 1)) {
+    		mostrarRecorrido(noVisitar);
+    		
     	}
-    	
+    	else {
        	
-        MapaTDA mapaAux = new Mapa();
-        mapaAux.InicializarMapa();
-        mapaAux = copiarGrafo(mapa, mapaAux);
-
-        ConjuntoTDA hijos = mapa.Adyacentes(clienteActual);
-   
-        double cota = Double.MAX_VALUE;
-        Integer clienteIdAux = null;
-        Integer horarioFin = hora;
-
-        while (!hijos.conjuntoVacio()){
-            Integer hijoId = hijos.elegir();
-            if(!visitados.contains(hijoId) && !noVisitar.contains(hijoId)) {
-            	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
-                while(mapaAux.ExisteArista(clienteActual,hijoId)){
-                    Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
-                    if (clienteHijo.getMinutosDisponibleDesde() <= hora + tiempo && hora + tiempo <= clienteHijo.getMinutosDisponibleHasta()) {
-                        double cotaAux = 0, km, totalKmRecubrimiento = 0;
-                        MapaTDA mapaPrim = new Mapa();
-                        mapaPrim.InicializarMapa();
-                        mapaPrim = copiarGrafo(mapa, mapaPrim);
-                      
-                        Integer primerClienteId = 1;
-                        Integer ultimoClienteId = hijoId;
-                        
-                        for(Integer visitado : visitados){
-                            mapaPrim.EliminarVertice(visitado);
-                        }
-                        mapaPrim.EliminarVertice(1);
-                        mapaPrim.EliminarVertice(hijoId);
-
-                        km = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
-                        //mapaPrim = prim(mapaPrim);  
-                   
-                        totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrim);
-                        cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapa),
-                                calcularARecubrimiento(ultimoClienteId, mapa));
-                        
-                        if(cotaAux < cota && cota <= cotaFinal){
-                            cota = cotaAux;
-                            kmVisitados = km ;
-                            horarioFin = hora+tiempo;
-                            clienteIdAux = hijoId;
-                        }
-                    }
-                    mapaAux.ElminarArista(clienteActual,hijoId);
-                }
-            }
-            hijos.sacar(hijoId);
-        }
-
-        if(noVisitar.size() == clientes.size() - 1) {
-        	System.out.println("No existen caminos posibles que satisfacen a todos los clientes");
-        }
-        else{
-        	if(visitados.size() == clientes.size() - 1) {
-        		noVisitar.add(clienteActual);
-        		Integer ultimo=visitados.get(visitados.size()-1);
-        		visitados.remove(visitados.size()-1);
-        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar); // restar km
-        	}
-        	else if (clienteIdAux==null) {        		
-        		noVisitar.add(clienteActual);
-        		Integer ultimo=visitados.get(visitados.size()-1);
-        		visitados.remove(visitados.size()-1);
-        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin, kmVisitados ,noVisitar); // restar km
-        	}        	
-        	else {
-        		visitados.add(clienteActual);
-        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, kmVisitados,new ArrayList<Integer>());
-        	}
-        }
-        
+	        MapaTDA mapaAux = new Mapa();
+	        mapaAux.InicializarMapa();
+	        mapaAux = copiarGrafo(mapa, mapaAux);
+	
+	        ConjuntoTDA hijos = mapa.Adyacentes(clienteActual);
+	   
+	        double cota = Double.MAX_VALUE;
+	        Integer clienteIdAux = null;
+	        Integer horarioFin = hora;
+	
+	        while (!hijos.conjuntoVacio()){
+	            Integer hijoId = hijos.elegir();
+	            if(!visitados.contains(hijoId) && !noVisitar.contains(hijoId)) {
+	            	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
+	                while(mapaAux.ExisteArista(clienteActual,hijoId)){
+	                    Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
+	                    if (clienteHijo.getMinutosDisponibleDesde() <= hora + tiempo && hora + tiempo <= clienteHijo.getMinutosDisponibleHasta()) {
+	                        double cotaAux = 0, km, totalKmRecubrimiento = 0;
+	                        MapaTDA mapaPrim = new Mapa();
+	                        mapaPrim.InicializarMapa();
+	                        mapaPrim = copiarGrafo(mapa, mapaPrim);
+	                      
+	                        Integer primerClienteId = 1;
+	                        Integer ultimoClienteId = hijoId;
+	                        
+	                        for(Integer visitado : visitados){
+	                            mapaPrim.EliminarVertice(visitado);
+	                        }
+	                        mapaPrim.EliminarVertice(1);
+	                        mapaPrim.EliminarVertice(hijoId);
+	
+	                        km = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
+	                        //mapaPrim = prim(mapaPrim);  
+	                   
+	                        totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrim);
+	                        cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapa),
+	                                calcularARecubrimiento(ultimoClienteId, mapa));
+	                        
+	                        if(cotaAux < cota && cota <= cotaFinal){
+	                            cota = cotaAux;
+	                            kmVisitados = km ;
+	                            horarioFin = hora+tiempo;
+	                            clienteIdAux = hijoId;
+	                        }
+	                    }
+	                    mapaAux.ElminarArista(clienteActual,hijoId);
+	                }
+	            }
+	            hijos.sacar(hijoId);
+	        }
+	
+	        if(noVisitar.size() == clientes.size() - 1) {
+	        	System.out.println("No existen caminos posibles que satisfacen a todos los clientes");
+	        }
+	        else{
+	        	if(visitados.size() == clientes.size() - 1) {
+	        		//noVisitar.remove(noVisitar.size()-1);
+	        		noVisitar.add(clienteActual);
+	        		Integer ultimo=visitados.get(visitados.size()-1);
+	        		visitados.remove(visitados.size()-1);
+	        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar); // restar km
+	        	}
+	        	else if (clienteIdAux==null) {
+	        		//noVisitar.remove(noVisitar.size()-1);
+	        		noVisitar.add(clienteActual);
+	        		Integer ultimo=visitados.get(visitados.size()-1);
+	        		visitados.remove(visitados.size()-1);
+	        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar); // restar km
+	        	}        	
+	        	else {
+	        		visitados.add(clienteActual);
+	        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, kmVisitados,new ArrayList<Integer>());
+	        	}
+	        }
+	    }
     }
 
     private static void mostrarRecorrido(List<Integer> visitados){
