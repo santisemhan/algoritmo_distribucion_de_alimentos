@@ -2,8 +2,12 @@ package main;
 
 import TDAs.api.MapaTDA;
 import TDAs.impl.Mapa;
+import TDAs.impl.Mapa.NodoArista;
+import TDAs.impl.Mapa.NodoMapa;
+import apis.ColaPrioridadTDA;
 import apis.ConjuntoTDA;
-import impl.ConjuntoLD;
+import impl.ColaPrioridadDA;
+import impl.ColaPrioridadLD;
 import modelo.Cliente;
 
 import java.io.BufferedReader;
@@ -19,20 +23,24 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         generarClientes();
-        generarMapa();
-        
-        planificarRecorrido(1, new ArrayList<Integer>(), (double)0, 7 * 60, 0, new ArrayList<Integer>());
+        generarMapa();        
+        planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, 0, new ArrayList<Integer>());
     }
 
-    private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaInf, Integer hora, double kmVisitados,List<Integer> noVisitar) {
+    private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, double kmVisitados,List<Integer> noVisitar) {
     	
+    	if(clienteActual == 1 && noVisitar.size() == clientes.size() - 1) {
+    		mostrarRecorrido(visitados);
+    	}
+    	
+       	
         MapaTDA mapaAux = new Mapa();
         mapaAux.InicializarMapa();
         mapaAux = copiarGrafo(mapa, mapaAux);
 
         ConjuntoTDA hijos = mapa.Adyacentes(clienteActual);
    
-        double cota = cotaInf;
+        double cota = Double.MAX_VALUE;
         Integer clienteIdAux = null;
         Integer horarioFin = hora;
 
@@ -58,13 +66,13 @@ public class Main {
                         mapaPrim.EliminarVertice(hijoId);
 
                         km = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
-                        mapaPrim = prim(mapaPrim);  
+                        //mapaPrim = prim(mapaPrim);  
                    
                         totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrim);
-                        cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapaPrim),
-                                calcularARecubrimiento(ultimoClienteId, mapaPrim));
+                        cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapa),
+                                calcularARecubrimiento(ultimoClienteId, mapa));
                         
-                        if(cotaAux < cota){
+                        if(cotaAux < cota && cota <= cotaFinal){
                             cota = cotaAux;
                             kmVisitados = km ;
                             horarioFin = hora+tiempo;
@@ -77,21 +85,25 @@ public class Main {
             hijos.sacar(hijoId);
         }
 
-        if(visitados.size() == clientes.size()){
-            mostrarRecorrido(visitados); // CAMBIAR A LISTA CAMINOS
-        }
-        else if(noVisitar.size() == clientes.size() - 1) {
-        	System.out.println("No existen caminos posibles");
+        if(noVisitar.size() == clientes.size() - 1) {
+        	System.out.println("No existen caminos posibles que satisfacen a todos los clientes");
         }
         else{
-        	if (clienteIdAux==null) {
+        	if(visitados.size() == clientes.size() - 1) {
         		noVisitar.add(clienteActual);
         		Integer ultimo=visitados.get(visitados.size()-1);
-        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados,noVisitar);
+        		visitados.remove(visitados.size()-1);
+        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar); // restar km
         	}
+        	else if (clienteIdAux==null) {        		
+        		noVisitar.add(clienteActual);
+        		Integer ultimo=visitados.get(visitados.size()-1);
+        		visitados.remove(visitados.size()-1);
+        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin, kmVisitados ,noVisitar); // restar km
+        	}        	
         	else {
         		visitados.add(clienteActual);
-        		planificarRecorrido(clienteIdAux, visitados, cota, horarioFin, kmVisitados,new ArrayList<Integer>());
+        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, kmVisitados,new ArrayList<Integer>());
         	}
         }
         
@@ -110,46 +122,25 @@ public class Main {
     	}
     }
 
-    public static MapaTDA copiarGrafo(MapaTDA grOrigen, MapaTDA grDestino) {
-        ConjuntoTDA con = grOrigen.Vertices();
-        ConjuntoTDA con2 = grOrigen.Vertices();
-        ConjuntoTDA aux = new ConjuntoLD();
-        aux.inicializarConjunto();
-        while(!con.conjuntoVacio()) {
-            int x = con.elegir();
-            grDestino.AgregarVertice(x);
-            con.sacar(x);
-        }
-        con = grOrigen.Vertices();
-        con2 = grOrigen.Vertices();
-        while(!con.conjuntoVacio()) {
-            int o = con.elegir();
-            con.sacar(o);
-            con2.sacar(o);
-            while(!con2.conjuntoVacio()) {
-                int d = con2.elegir();
-                aux.agregar(d);
-                con2.sacar(d);
-                if (grOrigen.ExisteArista(o, d) && !grDestino.ExisteArista(o, d)) {
-                    double pk = grOrigen.PesoAristaKm(o, d);
-                    int pm = grOrigen.PesoAristaMinutos(o, d);
-                    grDestino.AgregarArista(o, d, pm,pk);
-                } else if (grOrigen.ExisteArista(d, o) && !grDestino.ExisteArista(d, o)) {
-                    double pk = grOrigen.PesoAristaKm(d, o);
-                    int pm = grOrigen.PesoAristaMinutos(d, o);
-                    grDestino.AgregarArista(d, o,pm, pk);
-                }
-            }
-            while(!aux.conjuntoVacio()) {
-                int x = aux.elegir();
-                con2.agregar(x);
-                aux.sacar(x);
-
-            }
-        }
-
-        return grDestino;
-
+    public static MapaTDA copiarGrafo(MapaTDA mapa, MapaTDA nuevo){
+    	ConjuntoTDA c = mapa.Vertices();
+    	while(!c.conjuntoVacio()) {
+    		int v = c.elegir();
+    		c.sacar(v);
+    		nuevo.AgregarVertice(v);
+    	}
+    	
+    	c = mapa.Vertices();
+    	while(!c.conjuntoVacio()) {
+    		int v = c.elegir();
+    		c.sacar(v);
+			for(NodoArista n : mapa.getAristas(v)) {
+				nuevo.AgregarArista(v, n.nodoDestino.nodo, n.minutos, n.km);
+			}   		
+    	}
+    	
+    	
+        return nuevo;
     }
 
     private static double calcularArbolRecubrimiento(MapaTDA m){
@@ -189,6 +180,7 @@ public class Main {
                      mejorArista = mapaPrim.PesoAristaKm(vertice, v);
                  }
              }
+             vertices.sacar(v);
          }
 
          return mejorArista;
@@ -241,7 +233,9 @@ public class Main {
     private static void crearCamino(String line){
         String[] lineArray = line.split("\t");
         mapa.AgregarArista(getIdClienteByChar(lineArray[0]), getIdClienteByChar(lineArray[1]),
-                Integer.parseInt(lineArray[2]), Double.parseDouble(lineArray[3].replace(",", ".")));            
+                Integer.parseInt(lineArray[2]), Double.parseDouble(lineArray[3].replace(",", ".")));   
+        mapa.AgregarArista(getIdClienteByChar(lineArray[1]), getIdClienteByChar(lineArray[0]),
+                Integer.parseInt(lineArray[2]), Double.parseDouble(lineArray[3].replace(",", "."))); 
     }
 
     private static Integer getIdClienteByChar(String letra){
@@ -254,49 +248,7 @@ public class Main {
         char letra = (char) asciiNumber;
         return letra;
     }
-
-    public static MapaTDA prim (MapaTDA g) {
-    	MapaTDA mapaAux = new Mapa();
-        mapaAux.InicializarMapa();
-        
-        mapaAux=copiarGrafo(g,mapaAux);
-        
-        MapaTDA resultado = new Mapa();
-        resultado.InicializarMapa();
-
-        ConjuntoTDA vertices = g.Vertices();
-        
-        while (!vertices.conjuntoVacio()) {
-        	int elemento=vertices.elegir();
-        	vertices.sacar(elemento);
-        	resultado.AgregarVertice(elemento);
-        }
-        
-        vertices= g.Vertices();
-        
-        
-        while(!vertices.conjuntoVacio()) {
-        	int elemento=vertices.elegir();
-        	vertices.sacar(elemento);
-        	ConjuntoTDA verticesAux = g.Vertices();
-        	verticesAux.sacar(elemento);
-        	while (!verticesAux.conjuntoVacio()) {
-        		int aux = verticesAux.elegir();
-        		verticesAux.sacar(aux);
-        		if (mapaAux.ExisteArista(elemento, aux)) {
-        			if (!resultado.ExisteArista(elemento, aux)) {
-        				resultado.AgregarArista(aux, elemento , mapaAux.PesoAristaMinutos(aux, elemento) , mapaAux.PesoAristaKm(aux, elemento) );	
-        			}
-        			else if (resultado.PesoAristaKm(aux, elemento)  > mapaAux.PesoAristaKm(aux, elemento)) {
-        					resultado.ElminarArista(elemento, aux);
-        					resultado.AgregarArista(aux, elemento , mapaAux.PesoAristaMinutos(elemento, aux) , mapaAux.PesoAristaKm(aux, elemento) );	
-        				}
-        			}
-        			mapaAux.ElminarArista(elemento, aux);
-        		}
-        	}
-        
-        return resultado;
-    }     
+    
+    
 }
 

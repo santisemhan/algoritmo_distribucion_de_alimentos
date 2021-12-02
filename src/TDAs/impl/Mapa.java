@@ -1,21 +1,24 @@
 package TDAs.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import TDAs.api.MapaTDA;
 import apis.ConjuntoTDA;
 import impl.ConjuntoLD;
 
 public class Mapa implements MapaTDA {
-    class NodoMapa{
-        int nodo;
-        NodoArista arista;
-        NodoMapa sigNodo;
+    public class NodoMapa{
+        public int nodo;
+        public NodoArista arista;
+        public NodoMapa sigNodo;
     }
 
-    class NodoArista{
-        double km;
-        int minutos;
-        NodoMapa nodoDestino;
-        NodoArista sigArista;
+    public class NodoArista{
+        public double km;
+        public int minutos;
+        public NodoMapa nodoDestino;
+        public NodoArista sigArista;
     }
 
     NodoMapa origen;
@@ -99,17 +102,11 @@ public class Mapa implements MapaTDA {
     public double PesoAristaKm(int v1, int v2) {   	
         NodoMapa n1 = Vert2Nodo(v1);
         NodoArista aux = n1.arista;
-        if(aux != null) {
-        	while(aux.nodoDestino.nodo != v2){
-                aux = aux.sigArista;
-            }
-        }else {
-        	n1 = Vert2Nodo(v2);
-            aux = n1.arista;
-            while(aux.nodoDestino.nodo != v1){
-                aux = aux.sigArista;
-            }        
+       
+    	while(aux.nodoDestino.nodo != v2){
+            aux = aux.sigArista;
         }
+        
         return aux.km;
     }
 
@@ -117,18 +114,10 @@ public class Mapa implements MapaTDA {
     public int PesoAristaMinutos(int v1, int v2) {
         NodoMapa n1 = Vert2Nodo(v1);
         NodoArista aux = n1.arista;
-        if(aux != null) {
         while (aux.nodoDestino.nodo != v2) {
             aux = aux.sigArista;
         }
-        }
-        else {
-        	n1 = Vert2Nodo(v2);
-            aux = n1.arista;
-            while (aux.nodoDestino.nodo != v1) {
-                aux = aux.sigArista;
-            }
-        }
+        
         return aux.minutos;
     }
 
@@ -138,15 +127,7 @@ public class Mapa implements MapaTDA {
         NodoArista aux = n1.arista;
         while(aux != null && aux.nodoDestino.nodo != v2){
             aux = aux.sigArista;
-        }       
-        if(aux == null) {
-        	n1 = Vert2Nodo(v2);
-            aux = n1.arista;
-            while(aux != null && aux.nodoDestino.nodo != v1){
-                aux = aux.sigArista;
-            }
-        }
-        
+        }                     
         return aux != null;
     }
 
@@ -177,6 +158,16 @@ public class Mapa implements MapaTDA {
         	
         }
         return conjResultante;
+    }
+    
+    public List<NodoArista> getAristas(int v){
+    	NodoArista aux = Vert2Nodo(v).arista;
+    	List<NodoArista> result = new ArrayList();
+    	while(aux != null) {
+    		result.add(aux);
+    		aux = aux.sigArista;
+    	}
+    	return result;
     }
 
 }

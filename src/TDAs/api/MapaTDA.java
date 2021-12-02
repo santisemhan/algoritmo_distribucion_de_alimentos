@@ -1,6 +1,9 @@
 package TDAs.api;
 
+import java.util.List;
+
 import TDAs.impl.Mapa;
+import TDAs.impl.Mapa.NodoArista;
 import apis.ConjuntoTDA;
 
 public interface MapaTDA {
@@ -14,5 +17,6 @@ public interface MapaTDA {
     boolean ExisteArista (int v1, int v2);
     ConjuntoTDA Adyacentes(int v);
     ConjuntoTDA Vertices();
+    List<NodoArista> getAristas(int v);
 
 }
