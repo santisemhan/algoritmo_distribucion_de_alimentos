@@ -37,7 +37,7 @@ public class Main {
     	    	
         MapaTDA mapaAux = new Mapa();
         mapaAux.InicializarMapa();
-        mapaAux = copiarGrafo(mapa, mapaAux);
+        mapaAux = copiarMapa(mapa, mapaAux);
 
         ConjuntoTDA hijos = mapa.Adyacentes(clienteActual);
    
@@ -57,7 +57,7 @@ public class Main {
                         double cotaAux = 0, km = 0, totalKmRecubrimiento = 0;
                         MapaTDA mapaPrim = new Mapa();
                         mapaPrim.InicializarMapa();
-                        mapaPrim = copiarGrafo(mapa, mapaPrim);
+                        mapaPrim = copiarMapa(mapa, mapaPrim);
                       
                         Integer primerClienteId = 1;
                         Integer ultimoClienteId = hijoId;
@@ -68,7 +68,7 @@ public class Main {
                         mapaPrim.EliminarVertice(1);
                         mapaPrim.EliminarVertice(hijoId);
 
-                        //mapaPrim = prim(mapaPrim);  
+                        mapaPrim = prim(mapaPrim);  
                         
                         for(Camino c : solucionParcial) {
                         	km += c.getKm();
@@ -136,7 +136,7 @@ public class Main {
     	System.out.println("Total km: " + totalKm);
     }
 
-    public static MapaTDA copiarGrafo(MapaTDA mapa, MapaTDA nuevo){
+    public static MapaTDA copiarMapa(MapaTDA mapa, MapaTDA nuevo){
     	ConjuntoTDA c = mapa.Vertices();
     	while(!c.conjuntoVacio()) {
     		int v = c.elegir();
@@ -180,8 +180,6 @@ public class Main {
     }
 
     private static double calcularARecubrimiento(Integer vertice, MapaTDA mapaPrim){
-        // Revisar tiempo. Porque no sabemos si la cota tiene que tener en cuenta si llega o no llega al destino en horario
-
          ConjuntoTDA vertices = mapaPrim.Vertices();
          vertices.sacar(vertice);
 
@@ -198,6 +196,34 @@ public class Main {
          }
 
          return mejorArista;
+    }
+    
+    private static MapaTDA prim(MapaTDA mapaPrim) {
+    	MapaTDA mapaResultado = new Mapa();
+    	mapaResultado.InicializarMapa();
+    	
+    	ConjuntoTDA vertices = mapaPrim.Vertices();
+    	while(!vertices.conjuntoVacio()) {
+    		int v = vertices.elegir();
+    		vertices.sacar(v);
+    		mapaResultado.AgregarVertice(v);
+    	}
+    	
+    	vertices = mapaPrim.Vertices();
+    	while(!vertices.conjuntoVacio()){
+    		int v = vertices.elegir();
+    		vertices.sacar(v);
+    		ConjuntoTDA verticesAux = mapaPrim.Vertices();
+    		verticesAux.sacar(v);
+    		while(!verticesAux.conjuntoVacio()) {
+    			int vAux = verticesAux.elegir();
+    			verticesAux.sacar(vAux);
+    			double pesoArista = mapaPrim.getAristaMenorPesoKm(v, vAux);
+    			mapaResultado.AgregarArista(v, vAux, 0, pesoArista);
+    		}
+    	}
+    	
+    	return mapaResultado;
     }
 
     private static double calcularCotaInferior(double solucionParcial, double totalPrim, double recubrimientoAPrimero, double ultimoARecubrimiento){
