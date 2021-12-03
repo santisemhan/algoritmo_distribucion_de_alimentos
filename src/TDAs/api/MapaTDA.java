@@ -18,5 +18,5 @@ public interface MapaTDA {
     ConjuntoTDA Adyacentes(int v);
     ConjuntoTDA Vertices();
     List<NodoArista> getAristas(int v);
-
+    double getAristaMenorPesoKm(int v, int v1);
 }

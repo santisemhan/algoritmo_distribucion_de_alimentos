@@ -169,5 +169,18 @@ public class Mapa implements MapaTDA {
     	}
     	return result;
     }
+    
+    public double getAristaMenorPesoKm(int v, int v1) {
+    	NodoArista aux = Vert2Nodo(v).arista;
+    	double mejorArista = Double.MAX_VALUE;
+    	while(aux != null) {
+    		if(mejorArista > aux.km && aux.nodoDestino.nodo == v1) {
+    			mejorArista = aux.km;
+    		}
+    		aux = aux.sigArista;
+    	}
+    	
+    	return mejorArista;
+    }
 
 }

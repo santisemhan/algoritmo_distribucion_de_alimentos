@@ -1,5 +1,16 @@
 Cliente	Denominacion	Direccion	Cantidad	HorarioInicio	HorarioFinal
 A	CentroDistribucion	"Comesana 4056"			
-B	Boedo	"Boedo 777"	100	7	17
-C	Villareal	"Lope de Vega 2503"	100	7	17
-D	Flores	"Eva Peron 2202"	250	7	17
+B	Boedo	"Boedo 777"	100	8	17
+C	Villareal	"Lope de Vega 2503"	100	8	17
+D	Flores	"Eva Peron 2202"	250	8	17
+E	TresDeFebrero	"La Plata 3635"	200	7	16
+F	Retiro	"Viamonte 1571"	150	8	15
+G	VillaUrquiza	"Cullen 5085"	250	7	16
+H	Lugano	"Larrazabal 3443"	320	7	17
+I	Moron	"Guillermo Brown 1300"	100	7	16
+J	VicenteLopez	"Maipu 1758"	200	8	15
+K	Munro	"Mitre 2951"	150	8	15
+L	Palermo	"Cervino 3515"	175	8	15
+M	Chacarita	"Elcano 3693"	250	8	17
+N	Lanus	"Rivadavia 2602"	320	7	12
+O	VillaMadero	"Boulogne 2000"	200	7	12

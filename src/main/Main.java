@@ -25,26 +25,23 @@ public class Main {
     public static void main(String[] args) throws Exception {
         generarClientes();
         generarMapa();        
-        planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, 0, new ArrayList<Integer>());
+        planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, new ArrayList<Integer>(), new ArrayList<Camino>());
     }
 
     private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, 
-    		double kmVisitados,List<Integer> noVisitar) {
+    		List<Integer> noVisitar, List<Camino> solucionParcial) {
     	
     	if(!visitados.contains(clienteActual)) {    		
     		visitados.add(clienteActual);
     	}
-    	
-    	if(clienteActual == 1 && noVisitar.size() == (clientes.size() - 1)) {
-    		mostrarRecorrido(visitados);
-    	}
-    	
+    	    	
         MapaTDA mapaAux = new Mapa();
         mapaAux.InicializarMapa();
         mapaAux = copiarGrafo(mapa, mapaAux);
 
         ConjuntoTDA hijos = mapa.Adyacentes(clienteActual);
    
+        Camino camino = null;
         double cota = Double.MAX_VALUE;
         Integer clienteIdAux = null;
         Integer horarioFin = hora;
@@ -57,7 +54,7 @@ public class Main {
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
                     Double caminoKms= mapaAux.PesoAristaKm(clienteActual, hijoId);
                     if (clienteHijo.getMinutosDisponibleDesde() <= hora + tiempo && hora + tiempo <= clienteHijo.getMinutosDisponibleHasta()) {
-                        double cotaAux = 0, km, totalKmRecubrimiento = 0;
+                        double cotaAux = 0, km = 0, totalKmRecubrimiento = 0;
                         MapaTDA mapaPrim = new Mapa();
                         mapaPrim.InicializarMapa();
                         mapaPrim = copiarGrafo(mapa, mapaPrim);
@@ -71,18 +68,23 @@ public class Main {
                         mapaPrim.EliminarVertice(1);
                         mapaPrim.EliminarVertice(hijoId);
 
-                        km = mapaAux.PesoAristaKm(clienteActual, hijoId) + kmVisitados;
                         //mapaPrim = prim(mapaPrim);  
+                        
+                        for(Camino c : solucionParcial) {
+                        	km += c.getKm();
+                        }
+                        
+                        km +=  caminoKms;
                    
                         totalKmRecubrimiento = calcularArbolRecubrimiento(mapaPrim);
                         cotaAux = calcularCotaInferior(km, totalKmRecubrimiento, calcularARecubrimiento(primerClienteId, mapa),
                                 calcularARecubrimiento(ultimoClienteId, mapa));
                         
-                        if(cotaAux < cota && cota <= cotaFinal){                                                                       
+                        if(cotaAux < cota && cotaAux < cotaFinal){                                                                       
                         	cota = cotaAux;
-                            kmVisitados = km ;
                             horarioFin = hora+tiempo;
                             clienteIdAux = hijoId;
+                            camino = new Camino(clienteActual, clienteIdAux, caminoKms, tiempo);
                         }
                     }
                     mapaAux.ElminarArista(clienteActual,hijoId);
@@ -100,35 +102,38 @@ public class Main {
         		Integer ultimo=visitados.get(visitados.size()-2);
         		visitados.remove(clienteActual);
         		noVisitar.add(clienteActual);
-        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar);
+        		solucionParcial.add(camino);
+        		planificarRecorrido(ultimo, visitados, cota, horarioFin ,noVisitar, solucionParcial);
         	}
-        	else if(clienteActual.equals(1) && clienteIdAux == null) {
-        		System.out.print(kmVisitados);
+        	else if(clienteActual.equals(1) && clienteIdAux == null) {        		
+        		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();        		        		
+        		Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));        		
+        		solucionParcial.add(vuelta);       		        		
+        		mostrarRecorrido(solucionParcial);
         	}
             else if (clienteIdAux==null) {
         		noVisitar.add(clienteActual);
         		visitados.remove(visitados.size()-1);
         		Integer ultimo=visitados.get(visitados.size()-1);
-        		kmVisitados = kmVisitados - mapa.PesoAristaKm(ultimo, clienteActual);
-        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin, kmVisitados ,noVisitar); // restar km
+        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial); // restar km
         	}        	
-        	else {
-        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, kmVisitados,new ArrayList<Integer>());
+        	else { 
+        		solucionParcial.add(camino);
+        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin,new ArrayList<Integer>(), solucionParcial);
         	}
         }
     }    
 
-    private static void mostrarRecorrido(List<Integer> visitados){
-    	System.out.println("Recorrido final...");
-    	/*
-    	for (Camino camino: caminos) {
-    		System.out.println("De : " + origenDestinoToChar(camino.getIdClienteOrigen()) + " hasta : " + origenDestinoToChar(camino.getIdClienteDestino()) + 
-    				" con kms : " + camino.getKm() + " llegando a las  : " + camino.getTiempo());
+    private static void mostrarRecorrido(List<Camino> recorridoFinal){
+    	Double totalKm = (double)0;
+    	for(Camino c : recorridoFinal) {
+    		totalKm += c.getKm();
+    		System.out.println("De " + c.getIdClienteOrigen() + " a " + c.getIdClienteDestino() + 
+    				" km: " + c.getKm() + " minutos: " + c.getTiempo());
     	}
-    	*/
-    	for (Integer v : visitados) {
-    		System.out.println(v);
-    	}
+    	
+    	System.out.println("----------------------------");
+    	System.out.println("Total km: " + totalKm);
     }
 
     public static MapaTDA copiarGrafo(MapaTDA mapa, MapaTDA nuevo){
