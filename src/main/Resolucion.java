@@ -21,8 +21,8 @@ public class Resolucion {
     }
 	
     public void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, 
-    		List<Integer> noVisitar, List<Camino> solucionParcial) {
-    	
+    		List<Integer> noVisitar, List<Camino> solucionParcial,List<Integer> tiempoAux,int mejorTiempoSolucion) {
+        int mejorTiempo=0;
     	if(!visitados.contains(clienteActual)) {    		
     		visitados.add(clienteActual);
     	}
@@ -75,6 +75,7 @@ public class Resolucion {
                         if(cotaAux < cota && cotaAux < cotaFinal){                                                                       
                         	cota = cotaAux;
                             horarioFin = hora+tiempo;
+                            mejorTiempo=tiempo;
                             clienteIdAux = hijoId;
                             camino = new Camino(clienteActual, clienteIdAux, caminoKms, tiempo);
                         }
@@ -95,31 +96,44 @@ public class Resolucion {
         		visitados.remove(clienteActual);
         		noVisitar.add(clienteActual);
         		solucionParcial.add(camino);
-        		planificarRecorrido(ultimo, visitados, cota, horarioFin ,noVisitar, solucionParcial);
+        		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+        		mejorTiempoSolucion=horarioFin;
+        		horarioFin=horarioFin-ultimoTiempo;
+        		planificarRecorrido(ultimo, visitados, cota, horarioFin ,noVisitar, solucionParcial,tiempoAux,mejorTiempoSolucion);
         	}
         	else if(clienteActual.equals(1) && clienteIdAux == null) {        		
-        		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();        		        		
+        		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
+        		System.out.println(mejorTiempoSolucion); // mejor tiempo
+        		System.out.println(  mejorTiempoSolucion + mapa.PesoAristaMinutos(1, solucionParcial.size() - 1)); //mejor tiempo + tiempo ultimo camino
         		Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));        		
-        		solucionParcial.add(vuelta);       		        		
+        		solucionParcial.add(vuelta);
         		mostrarRecorrido(solucionParcial);
         	}
             else if (clienteIdAux==null) {
         		noVisitar.add(clienteActual);
         		visitados.remove(visitados.size()-1);
         		Integer ultimo=visitados.get(visitados.size()-1);
-        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial); // restar km
+        		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+        		horarioFin=horarioFin-ultimoTiempo;
+        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux,mejorTiempoSolucion); // restar km
         	}        	
         	else { 
         		solucionParcial.add(camino);
-        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin,new ArrayList<Integer>(), solucionParcial);
+        		System.out.println(horarioFin);
+        		if (mejorTiempo!=0) {
+        			tiempoAux.add(mejorTiempo);
+        		}
+        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin,new ArrayList<Integer>(), solucionParcial,tiempoAux,mejorTiempoSolucion);
         	}
         }
     }    
 
     public void mostrarRecorrido(List<Camino> recorridoFinal){
     	Double totalKm = (double)0;
+    	Double totalMinutos = (double)0;
     	for(Camino c : recorridoFinal) {
     		totalKm += c.getKm();
+    		totalMinutos += c.getTiempo();
     		System.out.println("De " + FileUpload.origenDestinoToChar(c.getIdClienteOrigen()) + " a " + 
     		FileUpload.origenDestinoToChar(c.getIdClienteDestino()) +  " km: " + c.getKm() + 
     		" minutos: " + c.getTiempo());
@@ -127,5 +141,6 @@ public class Resolucion {
     	
     	System.out.println("----------------------------");
     	System.out.println("Total km: " + totalKm);
+    	System.out.println("Total minutis: " + totalMinutos);
     }  
 }
