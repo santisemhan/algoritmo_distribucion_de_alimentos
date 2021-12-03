@@ -8,6 +8,7 @@ import apis.ColaPrioridadTDA;
 import apis.ConjuntoTDA;
 import impl.ColaPrioridadDA;
 import impl.ColaPrioridadLD;
+import modelo.Camino;
 import modelo.Cliente;
 
 import java.io.BufferedReader;
@@ -24,17 +25,28 @@ public class Main {
     public static void main(String[] args) throws Exception {
         generarClientes();
         generarMapa();        
-        planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, 0, new ArrayList<Integer>());
+        planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, 0, new ArrayList<Integer>(), new ArrayList<Camino>());
     }
 
-    private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, double kmVisitados,List<Integer> noVisitar) {
+    private static void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, 
+    		double kmVisitados,List<Integer> noVisitar,List<Camino> caminos) {
     	
     	if(clienteActual == 1 && noVisitar.size() == (clientes.size() - 1)) {
     		mostrarRecorrido(noVisitar);
-    		
+    		System.out.println("CAMINOS :");
+    		for (int i=0;i<=caminos.size()+1;i++) {
+    			Camino hola=caminos.get(0);
+    			System.out.println(hola.getIdClienteOrigen());
+    			System.out.println(hola.getIdClienteDestino());
+    			System.out.println(hola.getKm());
+    			caminos.remove(0);
+    			System.out.println("------------------------");
+    		}
     	}
+    	
     	else {
-       	
+    		Camino mostrar=new Camino(1,1,0,0);
+    		Camino auxmostrar=mostrar;
 	        MapaTDA mapaAux = new Mapa();
 	        mapaAux.InicializarMapa();
 	        mapaAux = copiarGrafo(mapa, mapaAux);
@@ -51,6 +63,7 @@ public class Main {
 	            	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
 	                while(mapaAux.ExisteArista(clienteActual,hijoId)){
 	                    Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
+	                    Double caminoKms= mapaAux.PesoAristaKm(clienteActual, hijoId);
 	                    if (clienteHijo.getMinutosDisponibleDesde() <= hora + tiempo && hora + tiempo <= clienteHijo.getMinutosDisponibleHasta()) {
 	                        double cotaAux = 0, km, totalKmRecubrimiento = 0;
 	                        MapaTDA mapaPrim = new Mapa();
@@ -74,7 +87,11 @@ public class Main {
 	                                calcularARecubrimiento(ultimoClienteId, mapa));
 	                        
 	                        if(cotaAux < cota && cota <= cotaFinal){
-	                            cota = cotaAux;
+	                        	
+	                        	mostrar=new Camino(clienteActual, ultimoClienteId, caminoKms, tiempo);
+	                        	
+	                            
+	                        	cota = cotaAux;
 	                            kmVisitados = km ;
 	                            horarioFin = hora+tiempo;
 	                            clienteIdAux = hijoId;
@@ -84,6 +101,9 @@ public class Main {
 	                }
 	            }
 	            hijos.sacar(hijoId);
+	        }
+	        if (mostrar!= auxmostrar) {
+	        	caminos.add(mostrar);
 	        }
 	
 	        if(noVisitar.size() == clientes.size() - 1) {
@@ -95,18 +115,19 @@ public class Main {
 	        		noVisitar.add(clienteActual);
 	        		Integer ultimo=visitados.get(visitados.size()-1);
 	        		visitados.remove(visitados.size()-1);
-	        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar); // restar km
+	        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar,caminos); // restar km
 	        	}
 	        	else if (clienteIdAux==null) {
 	        		//noVisitar.remove(noVisitar.size()-1);
 	        		noVisitar.add(clienteActual);
 	        		Integer ultimo=visitados.get(visitados.size()-1);
 	        		visitados.remove(visitados.size()-1);
-	        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar); // restar km
+	        		planificarRecorrido(ultimo, visitados, cota, horarioFin, kmVisitados ,noVisitar,caminos); // restar km
 	        	}        	
 	        	else {
 	        		visitados.add(clienteActual);
-	        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, kmVisitados,new ArrayList<Integer>());
+	        		
+	        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, kmVisitados,new ArrayList<Integer>(),caminos);
 	        	}
 	        }
 	    }
