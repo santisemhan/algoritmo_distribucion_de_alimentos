@@ -74,7 +74,7 @@ public class Resolucion {
                         		MapaHelpper.calcularARecubrimiento(primerClienteId, mapa, verticesPrim),
                         		MapaHelpper.calcularARecubrimiento(ultimoClienteId, mapa, verticesPrim));
                         
-                        if(cotaAux < cota && cotaAux < cotaFinal){                                                                       
+                        if(cotaAux < cota && cotaAux < cotaFinal){ 
                         	cota = cotaAux;
                             horarioFin = hora+tiempo;
                             mejorTiempo=tiempo;
@@ -93,7 +93,15 @@ public class Resolucion {
         }
         
         else{
-        	if(visitados.size() == clientes.size() - 1) {
+        	if(clienteIdAux==null && visitados.size() == clientes.size() - 1) { // ultimo no es viable 
+        		noVisitar.add(clienteActual);
+        		visitados.remove(visitados.size()-1);
+        		Integer ultimo=visitados.get(visitados.size()-1);
+        		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+        		horarioFin=horarioFin-ultimoTiempo;
+        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux); 
+        	}
+            else if(visitados.size() == clientes.size() - 1) { // ultimo viable
         		Integer ultimo=visitados.get(visitados.size()-2);
         		visitados.remove(clienteActual);
         		noVisitar.add(clienteActual);
@@ -102,13 +110,13 @@ public class Resolucion {
         		horarioFin=horarioFin-ultimoTiempo;
         		planificarRecorrido(ultimo, visitados, cota, horarioFin ,noVisitar, solucionParcial,tiempoAux);
         	}
-        	else if(clienteActual.equals(1) && clienteIdAux == null) {        		
+        	else if(clienteActual.equals(1) && clienteIdAux == null) {    // Final   		
         		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
         		Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));        		
         		solucionParcial.add(vuelta);
         		mostrarRecorrido(solucionParcial);
         	}
-            else if (clienteIdAux==null) {
+            else if (clienteIdAux==null) { // no hay viable
         		noVisitar.add(clienteActual);
         		visitados.remove(visitados.size()-1);
         		Integer ultimo=visitados.get(visitados.size()-1);
@@ -116,7 +124,7 @@ public class Resolucion {
         		horarioFin=horarioFin-ultimoTiempo;
         		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux); 
         	}        	
-        	else { 
+        	else {  // Siguiente etapa
         		solucionParcial.add(camino);
         		tiempoAux.add(mejorTiempo);
         		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin,new ArrayList<Integer>(), solucionParcial,tiempoAux);
