@@ -68,10 +68,13 @@ public class Resolucion {
                         }
                         
                         km +=  caminoKms;
+                        
+                        ConjuntoTDA verticesPrim = mapaPrim.Vertices();
                    
                         totalKmRecubrimiento = MapaHelpper.calcularArbolRecubrimiento(mapaPrim);
-                        cotaAux = MapaHelpper.calcularCotaInferior(km, totalKmRecubrimiento, MapaHelpper.calcularARecubrimiento(primerClienteId, mapa),
-                        		MapaHelpper.calcularARecubrimiento(ultimoClienteId, mapa));
+                        cotaAux = MapaHelpper.calcularCotaInferior(km, totalKmRecubrimiento, 
+                        		MapaHelpper.calcularARecubrimiento(primerClienteId, mapa, verticesPrim),
+                        		MapaHelpper.calcularARecubrimiento(ultimoClienteId, mapa, verticesPrim));
                         
                         if(cotaAux < cota && cotaAux < cotaFinal){                                                                       
                         	cota = cotaAux;

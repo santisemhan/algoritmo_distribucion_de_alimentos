@@ -50,17 +50,17 @@ public class MapaHelpper {
 
     }
 
-    public static double calcularARecubrimiento(Integer vertice, MapaTDA mapaPrim){
-         ConjuntoTDA vertices = mapaPrim.Vertices();
+    public static double calcularARecubrimiento(Integer vertice, MapaTDA mapa, ConjuntoTDA verticesPrim){
+         ConjuntoTDA vertices = mapa.Vertices();
          vertices.sacar(vertice);
 
-         double mejorArista = 0;
+         double mejorArista = Double.MAX_VALUE;
 
          while (!vertices.conjuntoVacio()){
              Integer v = vertices.elegir();
-             if(mapaPrim.ExisteArista(vertice, v)){
-                 if(mejorArista > mapaPrim.PesoAristaKm(vertice, v)){
-                     mejorArista = mapaPrim.PesoAristaKm(vertice, v);
+             if(verticesPrim.pertenece(v)){
+                 if(mejorArista > mapa.PesoAristaKm(vertice, v)){
+                     mejorArista = mapa.PesoAristaKm(vertice, v);
                  }
              }
              vertices.sacar(v);
@@ -98,6 +98,6 @@ public class MapaHelpper {
     }
     
     public static double calcularCotaInferior(double solucionParcial, double totalPrim, double recubrimientoAPrimero, double ultimoARecubrimiento){
-        return solucionParcial + totalPrim + recubrimientoAPrimero + ultimoARecubrimiento;
+    	return solucionParcial + totalPrim + recubrimientoAPrimero + ultimoARecubrimiento;
     }
 }
