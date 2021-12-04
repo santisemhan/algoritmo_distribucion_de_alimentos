@@ -208,4 +208,13 @@ public class Mapa implements MapaTDA {
     	
     	return result;
     }
+    
+    public double getAllkmArista() {
+    	double result = (double)0;
+    	for(AristaDTO a : this.getAristasSort()) {
+    		result += a.km;
+    	}
+    	
+    	return result / 2;
+    }
 }
