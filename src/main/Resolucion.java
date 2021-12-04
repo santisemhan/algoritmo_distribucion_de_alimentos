@@ -61,15 +61,14 @@ public class Resolucion {
                         mapaPrim.EliminarVertice(1);
                         mapaPrim.EliminarVertice(hijoId);
 
-                        mapaPrim = MapaHelpper.prim(mapaPrim);  
-                        
+                        mapaPrim = MapaHelpper.prim(mapaPrim); 
+                        ConjuntoTDA verticesPrim = mapaPrim.Vertices();
+                                                
                         for(Camino c : solucionParcial) {
                         	km += c.getKm();
                         }
                         
-                        km +=  caminoKms;
-                        
-                        ConjuntoTDA verticesPrim = mapaPrim.Vertices();
+                        km +=  caminoKms;                                           
                    
                         totalKmRecubrimiento = MapaHelpper.calcularArbolRecubrimiento(mapaPrim);
                         cotaAux = MapaHelpper.calcularCotaInferior(km, totalKmRecubrimiento, 

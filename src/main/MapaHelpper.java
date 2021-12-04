@@ -66,6 +66,10 @@ public class MapaHelpper {
              vertices.sacar(v);
          }
 
+         if(mejorArista == Double.MAX_VALUE) {
+        	 return 0;
+         }
+         
          return mejorArista;
     }
     
