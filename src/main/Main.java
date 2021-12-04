@@ -16,7 +16,7 @@ public class Main {
     	Resolucion resultado = new Resolucion(clientes,mapa);
     	
         resultado.planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, 
-        		new ArrayList<Integer>(), new ArrayList<Camino>(),new ArrayList<Integer>(),0);
+        		new ArrayList<Integer>(), new ArrayList<Camino>(),new ArrayList<Integer>());
     }
 }
 
