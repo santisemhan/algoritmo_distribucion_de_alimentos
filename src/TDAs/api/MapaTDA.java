@@ -5,6 +5,7 @@ import java.util.List;
 import TDAs.impl.Mapa;
 import TDAs.impl.Mapa.NodoArista;
 import apis.ConjuntoTDA;
+import modelo.AristaDTO;
 
 public interface MapaTDA {
     void InicializarMapa();
@@ -19,4 +20,5 @@ public interface MapaTDA {
     ConjuntoTDA Vertices();
     List<NodoArista> getAristas(int v);
     double getAristaMenorPesoKm(int v, int v1);
+    List<AristaDTO> getAristasSort();
 }

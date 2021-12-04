@@ -1,11 +1,13 @@
 package TDAs.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import TDAs.api.MapaTDA;
 import apis.ConjuntoTDA;
 import impl.ConjuntoLD;
+import modelo.AristaDTO;
 
 public class Mapa implements MapaTDA {
     public class NodoMapa{
@@ -183,4 +185,27 @@ public class Mapa implements MapaTDA {
     	return mejorArista;
     }
 
+    public List<AristaDTO> getAristasSort(){
+    	List<AristaDTO> result = new ArrayList<AristaDTO>();
+    	ConjuntoTDA c = this.Vertices();
+    	
+    	while(!c.conjuntoVacio()) {
+    		int v = c.elegir();
+    		c.sacar(v);
+    		List<AristaDTO> aristasNodo = new ArrayList<AristaDTO>();
+    		
+    		for(NodoArista na : this.getAristas(v)) {
+    			AristaDTO a = new AristaDTO();
+    			a.origen = v;
+    			a.destino = na.nodoDestino.nodo;
+    			a.km = na.km;
+    		}
+    		
+    		result.addAll(aristasNodo);
+    	}
+    	
+        Collections.sort(result, (e1,e2) -> Double.compare(e1.km, e2.km));
+    	
+    	return result;
+    }
 }
