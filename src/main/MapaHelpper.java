@@ -59,8 +59,8 @@ public class MapaHelpper {
          while (!vertices.conjuntoVacio()){
              Integer v = vertices.elegir();
              if(verticesPrim.pertenece(v)){
-                 if(mejorArista > mapa.PesoAristaKm(vertice, v)){
-                     mejorArista = mapa.PesoAristaKm(vertice, v);
+                 if(mejorArista > mapa.getAristaMenorPesoKm(vertice, v)){
+                     mejorArista = mapa.getAristaMenorPesoKm(vertice, v);
                  }
              }
              vertices.sacar(v);
