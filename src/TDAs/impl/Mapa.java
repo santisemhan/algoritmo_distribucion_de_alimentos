@@ -215,6 +215,7 @@ public class Mapa implements MapaTDA {
     			a.origen = v;
     			a.destino = na.nodoDestino.nodo;
     			a.km = na.km;
+    			aristasNodo.add(a);
     		}
     		
     		result.addAll(aristasNodo);
@@ -231,6 +232,6 @@ public class Mapa implements MapaTDA {
     		result += a.km;
     	}
     	
-    	return result / 2;
+    	return result;
     }
 }
