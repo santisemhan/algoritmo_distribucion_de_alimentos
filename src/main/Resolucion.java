@@ -23,6 +23,8 @@ public class Resolucion {
     public void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, 
     		List<Integer> noVisitar, List<Camino> solucionParcial,List<Integer> tiempoAux) {
 
+    	System.out.println("Entro: " + clienteActual);
+    	
     	if(!visitados.contains(clienteActual)) {    		
     		visitados.add(clienteActual);
     	}
@@ -42,6 +44,7 @@ public class Resolucion {
         while (!hijos.conjuntoVacio()){
             Integer hijoId = hijos.elegir();
             if(!visitados.contains(hijoId) && !noVisitar.contains(hijoId)) {
+            	System.out.println("Opcion: " + hijoId);
             	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
                 while(mapaAux.ExisteArista(clienteActual,hijoId)){
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
@@ -98,6 +101,7 @@ public class Resolucion {
         
         else{
         	if(clienteIdAux==null && visitados.size() == clientes.size() - 1) { // ultimo no es viable 
+        		noVisitar.clear();
         		noVisitar.add(clienteActual);
         		visitados.remove(visitados.size()-1);
         		Integer ultimo=visitados.get(visitados.size()-1);
@@ -121,6 +125,7 @@ public class Resolucion {
         		mostrarRecorrido(solucionParcial, horarioFin);
         	}
             else if (clienteIdAux==null) { // no hay viable
+            	noVisitar.clear();
         		noVisitar.add(clienteActual);
         		visitados.remove(visitados.size()-1);
         		Integer ultimo=visitados.get(visitados.size()-1);
@@ -149,7 +154,7 @@ public class Resolucion {
     	 	
     	System.out.println("----------------------------");
     	System.out.println("Total km: " + totalKm);
-    	System.out.println("Total minutos: " + totalMinutos);
+    	System.out.println("Total minutos: " + (totalMinutos + 7 * 60));
     	System.out.println("Total real: " + horarioFin);
     }  
 }
