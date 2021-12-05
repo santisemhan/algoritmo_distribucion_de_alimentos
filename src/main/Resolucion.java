@@ -23,12 +23,10 @@ public class Resolucion {
     public void planificarRecorrido(Integer clienteActual, List<Integer> visitados, Double cotaFinal, Integer hora, 
     		List<Integer> noVisitar, List<Camino> solucionParcial,List<Integer> tiempoAux) {
 
-    	System.out.println("Entro: " + clienteActual);
-    	
     	if(!visitados.contains(clienteActual)) {    		
     		visitados.add(clienteActual);
     	}
-    	    	
+    	   	     	    	
         MapaTDA mapaAux = new Mapa();
         mapaAux.InicializarMapa();
         mapaAux = MapaHelpper.copiarMapa(mapa, mapaAux);
@@ -94,52 +92,46 @@ public class Resolucion {
             }
             hijos.sacar(hijoId);
         }
-	
-        if(noVisitar.size() == clientes.size() - 1) {
-        	System.out.println("No existen caminos posibles que satisfacen a todos los clientes");
-        }
-        
-        else{
-        	if(clienteIdAux==null && visitados.size() == clientes.size() - 1) { // ultimo no es viable 
-        		noVisitar.clear();
-        		noVisitar.add(clienteActual);
-        		visitados.remove(visitados.size()-1);
-        		Integer ultimo=visitados.get(visitados.size()-1);
-        		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
-        		horarioFin=horarioFin-ultimoTiempo;
-        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux); 
-        	}
-            else if(visitados.size() == clientes.size() - 1) { // ultimo viable
-        		Integer ultimo=visitados.get(visitados.size()-2);
-        		visitados.remove(clienteActual);
-        		noVisitar.add(clienteActual);
-        		solucionParcial.add(camino);
-        		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);       
-        		horarioFin=horarioFin-ultimoTiempo;
-        		planificarRecorrido(ultimo, visitados, cota, horarioFin ,noVisitar, solucionParcial,tiempoAux);
-        	}
-        	else if(clienteActual.equals(1) && clienteIdAux == null) {    // Final   		
-        		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
-        		Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));        		
-        		solucionParcial.add(vuelta);
-        		mostrarRecorrido(solucionParcial, horarioFin);
-        	}
-            else if (clienteIdAux==null) { // no hay viable
-            	noVisitar.clear();
-        		noVisitar.add(clienteActual);
-        		visitados.remove(visitados.size()-1);
-        		Integer ultimo=visitados.get(visitados.size()-1);
-        		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
-        		horarioFin=horarioFin-ultimoTiempo;
-        		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux); 
-        	}        	
-        	else {  // Siguiente etapa
-        		solucionParcial.add(camino);
-        		tiempoAux.add(mejorTiempo);
-        		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin,new ArrayList<Integer>(), solucionParcial,tiempoAux);
-        	}
-        }
-    }    
+	      
+        if(clienteIdAux==null && visitados.size() == clientes.size() - 1) { // ultimo no es viable 
+    		noVisitar.clear();
+    		noVisitar.add(clienteActual);
+    		visitados.remove(visitados.size()-1);
+    		Integer ultimo=visitados.get(visitados.size()-1);
+    		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+    		horarioFin=horarioFin-ultimoTiempo;
+    		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux); 
+    	}
+        else if(visitados.size() == clientes.size() - 1) { // ultimo viable
+    		Integer ultimo=visitados.get(visitados.size()-2);
+    		visitados.remove(clienteActual);
+    		noVisitar.add(clienteActual);
+    		solucionParcial.add(camino);
+    		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);       
+    		horarioFin=horarioFin-ultimoTiempo;
+    		planificarRecorrido(ultimo, visitados, cota, horarioFin ,noVisitar, solucionParcial,tiempoAux);
+    	}
+    	else if(clienteActual.equals(1) && clienteIdAux == null) {    // Final   		
+    		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
+    		Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));        		
+    		solucionParcial.add(vuelta);
+    		mostrarRecorrido(solucionParcial, horarioFin);
+    	}
+        else if (clienteIdAux==null) { // no hay viable
+        	noVisitar.clear();
+    		noVisitar.add(clienteActual);
+    		visitados.remove(visitados.size()-1);
+    		Integer ultimo=visitados.get(visitados.size()-1);
+    		int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+    		horarioFin=horarioFin-ultimoTiempo;
+    		planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin ,noVisitar, solucionParcial,tiempoAux); 
+    	}        	
+    	else {  // Siguiente etapa
+    		solucionParcial.add(camino);
+    		tiempoAux.add(mejorTiempo);
+    		planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin,new ArrayList<Integer>(), solucionParcial,tiempoAux);
+    	}
+    }  
 
     public void mostrarRecorrido(List<Camino> recorridoFinal, Integer horarioFin){
     	Double totalKm = (double)0;
