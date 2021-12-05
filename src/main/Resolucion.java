@@ -60,8 +60,14 @@ public class Resolucion {
                         }
                         mapaPrim.EliminarVertice(1);
                         mapaPrim.EliminarVertice(hijoId);
+                        
+                        
 
                         ConjuntoTDA verticesPrim = mapaPrim.Vertices();
+                        
+                        if(!verticesPrim.conjuntoVacio()) {                        	
+                        	mapaPrim = MapaHelpper.prim(mapaPrim);
+                        }
                                                 
                         for(Camino c : solucionParcial) {
                         	km += c.getKm();

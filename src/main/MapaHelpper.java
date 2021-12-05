@@ -4,6 +4,7 @@ import TDAs.api.MapaTDA;
 import TDAs.impl.Mapa;
 import TDAs.impl.Mapa.NodoArista;
 import apis.ConjuntoTDA;
+import impl.ConjuntoLD;
 
 public class MapaHelpper {
 	
@@ -57,5 +58,72 @@ public class MapaHelpper {
     
     public static double calcularCotaInferior(double solucionParcial, double totalPrim, double recubrimientoAPrimero, double ultimoARecubrimiento){
     	return solucionParcial + totalPrim + recubrimientoAPrimero + ultimoARecubrimiento;
+    }
+    
+    public static MapaTDA prim (MapaTDA g) {
+        int vertice;
+        int aux_vertice;
+        int mejor_vertice;
+        double mejor_distancia;
+        MapaTDA resultado = new Mapa();
+        resultado.InicializarMapa();
+
+        ConjuntoTDA vertices = g.Vertices();
+
+        vertice = vertices.elegir();
+        vertices.sacar(vertice);
+        resultado.AgregarVertice(vertice);
+
+        while(!vertices.conjuntoVacio()){
+            aux_vertice = vertices.elegir();
+            vertices.sacar(aux_vertice);
+            resultado.AgregarVertice(aux_vertice);
+            if(g.ExisteArista(aux_vertice, vertice)){
+                resultado.AgregarArista(aux_vertice, vertice, g.PesoAristaMinutos(aux_vertice, vertice), g.getAristaMenorPesoKm(aux_vertice, vertice));
+            }
+        }
+
+        ConjuntoTDA pendientes = g.Vertices();
+        pendientes.sacar(vertice);
+
+        ConjuntoTDA aux_pendientes = new ConjuntoLD();
+        aux_pendientes.inicializarConjunto();
+
+        while (!pendientes.conjuntoVacio()){
+            mejor_distancia = 0;
+            mejor_vertice = 0;
+
+            while (!pendientes.conjuntoVacio()){
+                aux_vertice = pendientes.elegir();
+                pendientes.sacar(aux_vertice);
+                aux_pendientes.agregar(aux_vertice);
+                if((!resultado.Adyacentes(aux_vertice).conjuntoVacio()) &&
+                    (mejor_distancia == 0 || (mejor_distancia > resultado.PesoAristaKm(aux_vertice , resultado.Adyacentes(aux_vertice ).elegir())))){
+                    mejor_distancia = resultado.getAristaMenorPesoKm(aux_vertice,resultado.Adyacentes(aux_vertice).elegir());
+                    mejor_vertice = aux_vertice;
+                }
+            }
+
+            vertice = mejor_vertice;
+            aux_pendientes.sacar(vertice);
+
+            while (!aux_pendientes.conjuntoVacio()){
+                aux_vertice = aux_pendientes.elegir();
+                aux_pendientes.sacar(aux_vertice);
+                pendientes.agregar(aux_vertice);
+                if(g.ExisteArista(aux_vertice, vertice)){
+                    if(resultado.Adyacentes(aux_vertice).conjuntoVacio()){
+                        resultado.AgregarArista(aux_vertice, vertice, g.PesoAristaMinutos(aux_vertice, vertice), g.getAristaMenorPesoKm(aux_vertice, vertice));
+                    }else {
+                        if(resultado.getAristaMenorPesoKm(aux_vertice, resultado.Adyacentes(aux_vertice).elegir()) > g.getAristaMenorPesoKm(aux_vertice, vertice)){
+                            resultado.ElminarArista(aux_vertice, resultado.Adyacentes(aux_vertice).elegir());
+                            resultado.AgregarArista(aux_vertice, vertice, g.PesoAristaMinutos(aux_vertice, vertice), g.getAristaMenorPesoKm(aux_vertice, vertice));
+                        }
+                    }
+                }
+            }
+        }
+
+        return resultado;
     }
 }
