@@ -42,7 +42,6 @@ public class Resolucion {
         while (!hijos.conjuntoVacio()){
             Integer hijoId = hijos.elegir();
             if(!visitados.contains(hijoId) && !noVisitar.contains(hijoId)) {
-            	System.out.println("Opcion: " + hijoId);
             	Cliente clienteHijo = clientes.stream().filter(c -> c.getId().equals(hijoId)).findFirst().orElse(null);
                 while(mapaAux.ExisteArista(clienteActual,hijoId)){
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
