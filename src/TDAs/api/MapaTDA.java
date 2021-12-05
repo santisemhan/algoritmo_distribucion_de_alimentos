@@ -22,4 +22,5 @@ public interface MapaTDA {
     double getAristaMenorPesoKm(int v, int v1);
     List<AristaDTO> getAristasSort();
     double getAllkmArista();
+    NodoArista getAristaObjMenorPesoKm(int v, int v1);
 }

@@ -60,9 +60,7 @@ public class Resolucion {
                         }
                         mapaPrim.EliminarVertice(1);
                         mapaPrim.EliminarVertice(hijoId);
-                        
-                        
-
+                                               
                         ConjuntoTDA verticesPrim = mapaPrim.Vertices();
                         
                         if(!verticesPrim.conjuntoVacio()) {                        	
@@ -120,7 +118,7 @@ public class Resolucion {
         		Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
         		Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));        		
         		solucionParcial.add(vuelta);
-        		mostrarRecorrido(solucionParcial);
+        		mostrarRecorrido(solucionParcial, horarioFin);
         	}
             else if (clienteIdAux==null) { // no hay viable
         		noVisitar.add(clienteActual);
@@ -138,7 +136,7 @@ public class Resolucion {
         }
     }    
 
-    public void mostrarRecorrido(List<Camino> recorridoFinal){
+    public void mostrarRecorrido(List<Camino> recorridoFinal, Integer horarioFin){
     	Double totalKm = (double)0;
     	Double totalMinutos = (double)0;
     	for(Camino c : recorridoFinal) {
@@ -152,5 +150,6 @@ public class Resolucion {
     	System.out.println("----------------------------");
     	System.out.println("Total km: " + totalKm);
     	System.out.println("Total minutos: " + totalMinutos);
+    	System.out.println("Total real: " + horarioFin);
     }  
 }

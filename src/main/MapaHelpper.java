@@ -79,7 +79,8 @@ public class MapaHelpper {
             vertices.sacar(aux_vertice);
             resultado.AgregarVertice(aux_vertice);
             if(g.ExisteArista(aux_vertice, vertice)){
-                resultado.AgregarArista(aux_vertice, vertice, g.PesoAristaMinutos(aux_vertice, vertice), g.getAristaMenorPesoKm(aux_vertice, vertice));
+            	NodoArista na = resultado.getAristaObjMenorPesoKm(aux_vertice, vertice);
+                resultado.AgregarArista(aux_vertice, vertice, na.minutos, na.km);
             }
         }
 
@@ -113,11 +114,13 @@ public class MapaHelpper {
                 pendientes.agregar(aux_vertice);
                 if(g.ExisteArista(aux_vertice, vertice)){
                     if(resultado.Adyacentes(aux_vertice).conjuntoVacio()){
-                        resultado.AgregarArista(aux_vertice, vertice, g.PesoAristaMinutos(aux_vertice, vertice), g.getAristaMenorPesoKm(aux_vertice, vertice));
+                    	NodoArista na = resultado.getAristaObjMenorPesoKm(aux_vertice, vertice);
+                        resultado.AgregarArista(aux_vertice, vertice, na.minutos, na.km);
                     }else {
                         if(resultado.getAristaMenorPesoKm(aux_vertice, resultado.Adyacentes(aux_vertice).elegir()) > g.getAristaMenorPesoKm(aux_vertice, vertice)){
                             resultado.ElminarArista(aux_vertice, resultado.Adyacentes(aux_vertice).elegir());
-                            resultado.AgregarArista(aux_vertice, vertice, g.PesoAristaMinutos(aux_vertice, vertice), g.getAristaMenorPesoKm(aux_vertice, vertice));
+                            NodoArista na = resultado.getAristaObjMenorPesoKm(aux_vertice, vertice);
+                            resultado.AgregarArista(aux_vertice, vertice, na.minutos, na.km);
                         }
                     }
                 }
