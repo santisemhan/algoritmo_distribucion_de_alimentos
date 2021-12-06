@@ -46,7 +46,8 @@ public class Resolucion {
                 while(mapaAux.ExisteArista(clienteActual,hijoId)){
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
                     Double caminoKms= mapaAux.PesoAristaKm(clienteActual, hijoId);
-                    if (true) {                   	
+                    if (clienteHijo.getMinutosDisponibleDesde() <= hora + tiempo && hora + tiempo <= clienteHijo.getMinutosDisponibleHasta()) {          
+                    	
                         double cotaAux = 0, km = 0, totalKmRecubrimiento = 0;
                         MapaTDA mapaPrim = new Mapa();
                         mapaPrim.InicializarMapa();
@@ -100,7 +101,9 @@ public class Resolucion {
         }
         System.out.println("-------------------------------------------------------");*/
           
-        
+        System.out.println("De: " + clienteActual + " Hasta: " + (clienteIdAux == null ? "Ninguno " : clienteIdAux.toString()) 
+                + " Cota Final: " + cotaFinal + " CotaAux: " +  (cota == Double.MAX_VALUE ? "" : cota) + 
+                " tiempo: " + tiempoAux + " horario: " + horarioFin + " sumar: " + mejorTiempo );
         if(clienteIdAux==null && visitados.size()==clientes.size()-1 ) {
         	visitados.remove(visitados.size()-1);
         	solucionAux.remove(solucionAux.size()-1);
@@ -112,6 +115,8 @@ public class Resolucion {
 		    	hijos.sacar(elem);
 		    	matriz[clienteActual-1][elem-1]=0;
 		    }
+		    int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+    		horarioFin=horarioFin-ultimoTiempo;
 		    planificarRecorrido(ultimo, visitados, cotaFinal, hora, matriz, solucionAux, solucionParcial,tiempoAux) ; 
         }
         else if (visitados.size()==clientes.size()-1) {
@@ -127,12 +132,15 @@ public class Resolucion {
 		    	hijos.sacar(elem);
 		    	matriz[clienteActual-1][elem-1]=0;
 		    }
+		    int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);       
+    		horarioFin=horarioFin-ultimoTiempo-mejorTiempo;
             planificarRecorrido(ultimo, visitados, cota, horarioFin ,matriz, solucionAux,solucionParcial,tiempoAux);
         }
         else if(clienteActual.equals(1) && clienteIdAux==null){
         	Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
             Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));
             solucionParcial.add(vuelta);
+            System.out.println(mejorTiempo);
             mostrarRecorrido(solucionParcial, horarioFin);
         }
         else if(clienteIdAux==null) { // no hay viable
@@ -146,13 +154,16 @@ public class Resolucion {
 		    	hijos.sacar(elem);
 		    	matriz[clienteActual-1][elem-1]=0;
 		    }
-		    planificarRecorrido(ultimo, visitados, cotaFinal, hora, matriz, solucionAux, solucionParcial,tiempoAux) ; 
+		    int ultimoTiempo=tiempoAux.remove(tiempoAux.size()-1);
+    		horarioFin=horarioFin-ultimoTiempo;
+		    planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin, matriz, solucionAux, solucionParcial,tiempoAux) ; 
 	   }
 	   else {
 		   if(solucionAux.size() != 0 && solucionAux.get(solucionAux.size() - 1).getIdClienteOrigen() == camino.getIdClienteOrigen()) {
 			   solucionAux.remove(solucionAux.size() - 1);
 		   }
 		   solucionAux.add(camino);
+		   tiempoAux.add(mejorTiempo);
 		   planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, matriz,solucionAux, solucionParcial,tiempoAux);
 	   }
     }  
@@ -170,7 +181,7 @@ public class Resolucion {
     	 	
     	System.out.println("----------------------------");
     	System.out.println("Total km: " + totalKm);
-    	System.out.println("Total minutos: " + (totalMinutos + 7 * 60));
+    	System.out.println("Total minutos: " + (totalMinutos));
     	System.out.println("Total real: " + horarioFin);
     }  
 }
