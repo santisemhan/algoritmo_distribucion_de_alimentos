@@ -101,7 +101,7 @@ public class Resolucion {
         }
         System.out.println("-------------------------------------------------------");*/
           
-        if(clienteIdAux==null && visitados.size()==clientes.size()-1 ) {
+        if(clienteIdAux==null && visitados.size()==clientes.size()-1 ) { // ultimo no viable
         	visitados.remove(visitados.size()-1);
         	solucionAux.remove(solucionAux.size()-1);
 		    Integer ultimo=visitados.get(visitados.size()-1);
@@ -116,7 +116,7 @@ public class Resolucion {
     		horarioFin=horarioFin-ultimoTiempo;
 		    planificarRecorrido(ultimo, visitados, cotaFinal, hora, matriz, solucionAux, solucionParcial,tiempoAux) ; 
         }
-        else if (visitados.size()==clientes.size()-1) {
+        else if (visitados.size()==clientes.size()-1) { // ultimo viable
         	solucionParcial.clear();
         	Integer ultimo=visitados.get(visitados.size()-2);
             visitados.remove(clienteActual);
@@ -133,7 +133,7 @@ public class Resolucion {
     		horarioFin=horarioFin-ultimoTiempo-mejorTiempo;
             planificarRecorrido(ultimo, visitados, cota, horarioFin ,matriz, solucionAux,solucionParcial,tiempoAux);
         }
-        else if(clienteActual.equals(1) && clienteIdAux==null){
+        else if(clienteActual.equals(1) && clienteIdAux==null){ // Final
         	Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
             Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));
             solucionParcial.add(vuelta);
@@ -154,7 +154,7 @@ public class Resolucion {
     		horarioFin=horarioFin-ultimoTiempo;
 		    planificarRecorrido(ultimo, visitados, cotaFinal, horarioFin, matriz, solucionAux, solucionParcial,tiempoAux) ; 
 	   }
-	   else {
+	   else { // viable
 		   if(solucionAux.size() != 0 && solucionAux.get(solucionAux.size() - 1).getIdClienteOrigen() == camino.getIdClienteOrigen()) {
 			   solucionAux.remove(solucionAux.size() - 1);
 		   }
@@ -178,6 +178,5 @@ public class Resolucion {
     	System.out.println("----------------------------");
     	System.out.println("Total km: " + totalKm);
     	System.out.println("Total minutos: " + (totalMinutos));
-    	System.out.println("Total real: " + horarioFin);
     }  
 }
