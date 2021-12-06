@@ -16,15 +16,10 @@ public class Main {
     	
     	Resolucion resultado = new Resolucion(clientes,mapa);
     	
-        resultado.planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, crearMatriz(clientes.size()),
+        resultado.planificarRecorrido(1, new ArrayList<Integer>(), Double.MAX_VALUE, 7 * 60, MapaHelpper.crearMatriz(clientes.size()),
         		 new ArrayList<Camino>(), new ArrayList<Camino>(),new ArrayList<Integer>());
         		
     }
-    
-    public static int[][] crearMatriz(int n){
-    	int[][] twoD = new int[n][n];
-
-    	return twoD;
-    }
+       
 }
 

@@ -129,4 +129,10 @@ public class MapaHelpper {
 
         return resultado;
     }
+    
+    public static int[][] crearMatriz(int n){
+    	int[][] twoD = new int[n][n];
+
+    	return twoD;
+    }
 }
