@@ -101,9 +101,6 @@ public class Resolucion {
         }
         System.out.println("-------------------------------------------------------");*/
           
-        System.out.println("De: " + clienteActual + " Hasta: " + (clienteIdAux == null ? "Ninguno " : clienteIdAux.toString()) 
-                + " Cota Final: " + cotaFinal + " CotaAux: " +  (cota == Double.MAX_VALUE ? "" : cota) + 
-                " tiempo: " + tiempoAux + " horario: " + horarioFin + " sumar: " + mejorTiempo );
         if(clienteIdAux==null && visitados.size()==clientes.size()-1 ) {
         	visitados.remove(visitados.size()-1);
         	solucionAux.remove(solucionAux.size()-1);
@@ -140,7 +137,6 @@ public class Resolucion {
         	Integer ultimoVisitado = solucionParcial.get(solucionParcial.size() - 1).getIdClienteDestino();
             Camino vuelta = new Camino(ultimoVisitado, 1,mapa.getAristaMenorPesoKm(ultimoVisitado, 1), mapa.PesoAristaMinutos(1, solucionParcial.size() - 1));
             solucionParcial.add(vuelta);
-            System.out.println(mejorTiempo);
             mostrarRecorrido(solucionParcial, horarioFin);
         }
         else if(clienteIdAux==null) { // no hay viable
