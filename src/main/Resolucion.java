@@ -38,7 +38,7 @@ public class Resolucion {
         Integer clienteIdAux = null;
         Integer horarioFin = hora;
         int mejorTiempo= 0;
-
+        
         while (!hijos.conjuntoVacio()){
             Integer hijoId = hijos.elegir();
             if(!visitados.contains(hijoId) && matriz[clienteActual-1][hijoId-1]==0) {
@@ -46,7 +46,7 @@ public class Resolucion {
                 while(mapaAux.ExisteArista(clienteActual,hijoId)){
                     Integer tiempo = mapaAux.PesoAristaMinutos(clienteActual, hijoId);
                     Double caminoKms= mapaAux.PesoAristaKm(clienteActual, hijoId);
-                    if (1>0) {
+                    if (true) {                   	
                         double cotaAux = 0, km = 0, totalKmRecubrimiento = 0;
                         MapaTDA mapaPrim = new Mapa();
                         mapaPrim.InicializarMapa();
@@ -70,7 +70,7 @@ public class Resolucion {
                         for(Camino c : solucionAux) {
                         	km += c.getKm();
                         }
-                        
+                                               
                         km += caminoKms;                                           
                    
                         totalKmRecubrimiento = MapaHelpper.calcularArbolRecubrimiento(mapaPrim);
@@ -91,8 +91,19 @@ public class Resolucion {
             }
             hijos.sacar(hijoId);
         }
+        
+        /*System.out.println("De: " + clienteActual + " Hasta: " + (clienteIdAux == null ? "Ninguno " : clienteIdAux.toString()) 
+        		+ " Cota Final: " + cotaFinal + " CotaAux: " +  (cota == Double.MAX_VALUE ? "" : cota) );*/
+        
+        /*for(Camino c : solucionParcial) {
+        	System.out.println(c.getIdClienteOrigen() + " a " + c.getIdClienteDestino());
+        }
+        System.out.println("-------------------------------------------------------");*/
+          
+        
         if(clienteIdAux==null && visitados.size()==clientes.size()-1 ) {
         	visitados.remove(visitados.size()-1);
+        	solucionAux.remove(solucionAux.size()-1);
 		    Integer ultimo=visitados.get(visitados.size()-1);
 		    matriz[ultimo-1][clienteActual-1]=1;
 		    hijos=mapa.Adyacentes(clienteActual);
@@ -101,11 +112,13 @@ public class Resolucion {
 		    	hijos.sacar(elem);
 		    	matriz[clienteActual-1][elem-1]=0;
 		    }
-		    planificarRecorrido(clienteActual, visitados, cotaFinal, hora, matriz, solucionAux, solucionParcial,tiempoAux) ; 
+		    planificarRecorrido(ultimo, visitados, cotaFinal, hora, matriz, solucionAux, solucionParcial,tiempoAux) ; 
         }
         else if (visitados.size()==clientes.size()-1) {
+        	solucionParcial.clear();
         	Integer ultimo=visitados.get(visitados.size()-2);
             visitados.remove(clienteActual);
+            solucionParcial.addAll(solucionAux);
             solucionParcial.add(camino);
             matriz[ultimo-1][clienteActual-1]=1;
 		    hijos=mapa.Adyacentes(clienteActual);
@@ -124,6 +137,7 @@ public class Resolucion {
         }
         else if(clienteIdAux==null) { // no hay viable
 		    visitados.remove(visitados.size()-1);
+		    solucionAux.remove(solucionAux.size()-1);
 		    Integer ultimo=visitados.get(visitados.size()-1);
 		    matriz[ultimo-1][clienteActual-1]=1;
 		    hijos=mapa.Adyacentes(clienteActual);
@@ -135,7 +149,10 @@ public class Resolucion {
 		    planificarRecorrido(ultimo, visitados, cotaFinal, hora, matriz, solucionAux, solucionParcial,tiempoAux) ; 
 	   }
 	   else {
-		   solucionParcial.add(camino);
+		   if(solucionAux.size() != 0 && solucionAux.get(solucionAux.size() - 1).getIdClienteOrigen() == camino.getIdClienteOrigen()) {
+			   solucionAux.remove(solucionAux.size() - 1);
+		   }
+		   solucionAux.add(camino);
 		   planificarRecorrido(clienteIdAux, visitados, cotaFinal, horarioFin, matriz,solucionAux, solucionParcial,tiempoAux);
 	   }
     }  
